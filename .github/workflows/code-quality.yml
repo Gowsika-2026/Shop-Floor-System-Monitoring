@@ -1,0 +1,206 @@
+name: Code Quality & Maintenance
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # Code quality analysis
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      
+      - name: Install dependencies - Backend
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Install dependencies - Frontend
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Run ESLint with reports - Backend
+        working-directory: ./backend
+        run: |
+          npx eslint src --ext .ts,.tsx --format json --output-file eslint-report-backend.json || true
+          npx eslint src --ext .ts,.tsx || true
+      
+      - name: Run ESLint with reports - Frontend
+        working-directory: ./frontend
+        run: |
+          npx eslint src --ext .ts,.tsx --format json --output-file eslint-report-frontend.json || true
+          npx eslint src --ext .ts,.tsx || true
+      
+      - name: Upload ESLint reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eslint-reports
+          path: |
+            backend/eslint-report-backend.json
+            frontend/eslint-report-frontend.json
+
+  # Dependency audit
+  dependency-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      
+      - name: Audit backend dependencies
+        working-directory: ./backend
+        run: |
+          echo "## Backend Dependencies Audit" >> $GITHUB_STEP_SUMMARY
+          npm audit --json > audit-backend.json || true
+          npm audit >> $GITHUB_STEP_SUMMARY || echo "Vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Audit frontend dependencies
+        working-directory: ./frontend
+        run: |
+          echo "## Frontend Dependencies Audit" >> $GITHUB_STEP_SUMMARY
+          npm audit --json > audit-frontend.json || true
+          npm audit >> $GITHUB_STEP_SUMMARY || echo "Vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Upload audit reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-reports
+          path: |
+            backend/audit-backend.json
+            frontend/audit-frontend.json
+
+  # Check for outdated dependencies
+  dependency-check:
+    name: Check Outdated Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci
+          cd ../frontend && npm ci
+      
+      - name: Check outdated - Backend
+        working-directory: ./backend
+        run: |
+          echo "## Backend Outdated Dependencies" >> $GITHUB_STEP_SUMMARY
+          npm outdated >> $GITHUB_STEP_SUMMARY || true
+      
+      - name: Check outdated - Frontend
+        working-directory: ./frontend
+        run: |
+          echo "## Frontend Outdated Dependencies" >> $GITHUB_STEP_SUMMARY
+          npm outdated >> $GITHUB_STEP_SUMMARY || true
+
+  # Bundle size analysis
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Build and analyze bundle
+        working-directory: ./frontend
+        run: |
+          npm run build
+          echo "## Bundle Size Analysis" >> $GITHUB_STEP_SUMMARY
+          du -sh dist/* >> $GITHUB_STEP_SUMMARY || true
+          echo "Total bundle size:" >> $GITHUB_STEP_SUMMARY
+          du -sh dist >> $GITHUB_STEP_SUMMARY || true
+
+  # Code metrics
+  code-metrics:
+    name: Code Metrics
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Count lines of code
+        run: |
+          echo "## Code Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "### Lines of Code" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "Backend TypeScript:" >> $GITHUB_STEP_SUMMARY
+          find backend/src -name "*.ts" | xargs wc -l | tail -1 >> $GITHUB_STEP_SUMMARY
+          echo "Frontend TypeScript:" >> $GITHUB_STEP_SUMMARY
+          find frontend/src -name "*.ts" -o -name "*.tsx" | xargs wc -l | tail -1 >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Count files
+        run: |
+          echo "### File Counts" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "Backend files: $(find backend/src -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "Frontend files: $(find frontend/src -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  # Generate quality report
+  quality-report:
+    name: Generate Quality Report
+    runs-on: ubuntu-latest
+    needs: [code-quality, dependency-audit, dependency-check]
+    if: always()
+    
+    steps:
+      - name: Create summary
+        run: |
+          echo "# 📊 Code Quality Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | ${{ needs.code-quality.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit | ${{ needs.dependency-audit.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Check | ${{ needs.dependency-check.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

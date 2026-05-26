@@ -1,0 +1,176 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # Prepare deployment
+  prepare:
+    name: Prepare Deployment
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      environment: ${{ steps.env.outputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Get version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION=$(date +'%Y%m%d-%H%M%S')-${GITHUB_SHA::7}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deployment version: $VERSION"
+      
+      - name: Determine environment
+        id: env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [[ $GITHUB_REF == refs/tags/* ]]; then
+            ENV="production"
+          else
+            ENV="staging"
+          fi
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          echo "Deploying to: $ENV"
+
+  # Build application
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: prepare
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci --production=false
+      
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci --production=false
+      
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy
+          cp -r backend/dist deploy/backend
+          cp -r backend/package*.json deploy/backend/
+          cp -r frontend/dist deploy/frontend
+          tar -czf deploy-${{ needs.prepare.outputs.version }}.tar.gz deploy/
+      
+      - name: Upload deployment package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package
+          path: deploy-${{ needs.prepare.outputs.version }}.tar.gz
+          retention-days: 30
+
+  # Deploy to environment
+  deploy:
+    name: Deploy to ${{ needs.prepare.outputs.environment }}
+    runs-on: ubuntu-latest
+    needs: [prepare, build]
+    environment:
+      name: ${{ needs.prepare.outputs.environment }}
+      url: ${{ steps.deploy.outputs.url }}
+    
+    steps:
+      - name: Download deployment package
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-package
+      
+      - name: Extract package
+        run: tar -xzf deploy-${{ needs.prepare.outputs.version }}.tar.gz
+      
+      - name: Deploy application
+        id: deploy
+        run: |
+          echo "Deploying to ${{ needs.prepare.outputs.environment }}"
+          echo "Version: ${{ needs.prepare.outputs.version }}"
+          # Add your deployment commands here
+          # Examples:
+          # - Deploy to AWS S3/EC2
+          # - Deploy to Azure App Service
+          # - Deploy to Google Cloud
+          # - Deploy to your custom server via SSH
+          echo "url=https://shop-floor-${{ needs.prepare.outputs.environment }}.example.com" >> $GITHUB_OUTPUT
+      
+      - name: Health check
+        run: |
+          echo "Running health check..."
+          # Add health check commands here
+          # curl -f https://your-app-url/health || exit 1
+      
+      - name: Notify deployment
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" == "success" ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+          fi
+
+  # Post-deployment verification
+  verify:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    needs: [prepare, deploy]
+    
+    steps:
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests..."
+          # Add smoke test commands here
+          # Example: curl checks, basic API tests
+      
+      - name: Update deployment status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}' === 'success' ? '✅ Verified' : '❌ Failed';
+            core.notice(`Deployment verification: ${status}`);
