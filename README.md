@@ -1,5 +1,9 @@
 # Shop-Floor Resource Allocation System
 
+[![CI/CD Pipeline](https://github.com/Gowsika-2026/Shop-Floor-System-Monitoring/actions/workflows/ci.yml/badge.svg)](https://github.com/Gowsika-2026/Shop-Floor-System-Monitoring/actions/workflows/ci.yml)
+[![Code Quality](https://github.com/Gowsika-2026/Shop-Floor-System-Monitoring/actions/workflows/code-quality.yml/badge.svg)](https://github.com/Gowsika-2026/Shop-Floor-System-Monitoring/actions/workflows/code-quality.yml)
+[![Deployment](https://github.com/Gowsika-2026/Shop-Floor-System-Monitoring/actions/workflows/deploy.yml/badge.svg)](https://github.com/Gowsika-2026/Shop-Floor-System-Monitoring/actions/workflows/deploy.yml)
+
 A comprehensive system for manufacturing supervisors to manage and allocate shop-floor resources (operators, machines, materials) to work orders in real-time, minimizing idle time and maximizing utilization.
 
 ## Project Overview
