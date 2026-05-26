@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "./scripts/check-env.sh",
+        "windows": "powershell -ExecutionPolicy Bypass -File .github/hooks/scripts/check-env.ps1",
+        "timeout": 5
+      }
+    ]
+  }
+}

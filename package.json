@@ -1,0 +1,41 @@
+{
+  "name": "shop-floor-resource-allocation",
+  "version": "1.0.0",
+  "description": "Shop-floor Resource Allocation System - Manufacturing resource management with real-time tracking",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:webkit": "playwright test --project=webkit",
+    "test:e2e:mobile": "playwright test --project=mobile-chrome",
+    "test:report": "playwright show-report",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "manufacturing",
+    "resource-allocation",
+    "shop-floor",
+    "typescript",
+    "react",
+    "nodejs",
+    "express",
+    "postgresql",
+    "playwright",
+    "e2e-testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.40.1",
+    "@types/node": "^20.10.6",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  }
+}

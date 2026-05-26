@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "npx prettier --write",
+        "windows": "powershell -Command \"if ($env:TOOL_NAME -eq 'create_file' -or $env:TOOL_NAME -eq 'replace_string_in_file' -or $env:TOOL_NAME -eq 'multi_replace_string_in_file') { $files = $env:FILE_PATHS -split ';'; foreach ($file in $files) { if ($file -match '\\.(ts|tsx|js|jsx|json)$') { npx prettier --write $file } } }\"",
+        "timeout": 30
+      }
+    ]
+  }
+}

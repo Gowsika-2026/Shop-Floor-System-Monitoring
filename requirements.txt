@@ -1,0 +1,39 @@
+# Python Testing Dependencies for Shop-floor Resource Allocation System
+# Install: pip install -r requirements.txt
+
+# Testing Framework
+pytest==7.4.3
+pytest-html==4.1.1
+pytest-cov==4.1.0
+pytest-xdist==3.5.0
+pytest-mock==3.12.0
+pytest-timeout==2.2.0
+
+# API Testing
+requests==2.31.0
+pytest-flask==1.3.0
+
+# Database Testing
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23
+
+# Data Generation & Mocking
+faker==22.0.0
+factory-boy==3.3.0
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Type Checking
+mypy==1.7.1
+types-requests==2.31.0.10
+
+# Code Quality
+pylint==3.0.3
+black==23.12.1
+flake8==7.0.0
+
+# Report Generation
+allure-pytest==2.13.2
+pytest-json-report==1.5.0

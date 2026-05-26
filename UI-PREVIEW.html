@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop-floor Resource Allocation System - UI Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background-color: #1976d2;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .nav-item .material-icons {
+            font-size: 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-header h2 {
+            font-size: 28px;
+            font-weight: 400;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 300;
+            color: #1976d2;
+            margin-bottom: 16px;
+        }
+        
+        .stat-breakdown {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .stat-item strong {
+            color: #333;
+        }
+        
+        /* Button */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: #f5f5f5;
+        }
+        
+        th {
+            text-align: left;
+            padding: 16px;
+            font-weight: 500;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        tbody tr:hover {
+            background-color: #fafafa;
+        }
+        
+        /* Chip/Badge */
+        .chip {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .chip-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .chip-info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .chip-warning {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .chip-error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        /* Icon buttons */
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            color: #666;
+            transition: background-color 0.2s;
+        }
+        
+        .icon-btn:hover {
+            background-color: rgba(0,0,0,0.04);
+        }
+        
+        .icon-btn .material-icons {
+            font-size: 20px;
+        }
+        
+        /* Tab navigation */
+        .tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 0;
+            cursor: pointer;
+            color: #666;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #1976d2;
+            border-bottom-color: #1976d2;
+        }
+        
+        .tab:hover {
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>Shop-floor System</h1>
+            </div>
+            <div class="nav-item" onclick="showPage('dashboard')">
+                <span class="material-icons">dashboard</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item active" onclick="showPage('operators')">
+                <span class="material-icons">people</span>
+                <span>Operators</span>
+            </div>
+            <div class="nav-item" onclick="showPage('machines')">
+                <span class="material-icons">precision_manufacturing</span>
+                <span>Machines</span>
+            </div>
+            <div class="nav-item" onclick="showPage('materials')">
+                <span class="material-icons">inventory_2</span>
+                <span>Materials</span>
+            </div>
+            <div class="nav-item" onclick="showPage('workorders')">
+                <span class="material-icons">assignment</span>
+                <span>Work Orders</span>
+            </div>
+            <div class="nav-item" onclick="showPage('allocation')">
+                <span class="material-icons">assignment_ind</span>
+                <span>Allocations</span>
+            </div>
+            <div class="nav-item" onclick="showPage('analytics')">
+                <span class="material-icons">analytics</span>
+                <span>Analytics</span>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Dashboard</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Operators</h3>
+                        <div class="stat-number">24</div>
+                        <div class="stat-breakdown">
+                            <div class="stat-item"><strong>15</strong> Available</div>
+                            <div class="stat-item"><strong>6</strong> Assigned</div>
+                            <div class="stat-item"><strong>2</strong> On Break</div>
+                            <div class="stat-item"><strong>1</strong> Absent</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>Machines</h3>
+                        <div class="stat-number">18</div>
+                        <div class="stat-breakdown">
+                            <div class="stat-item"><strong>10</strong> Idle</div>
+                            <div class="stat-item"><strong>5</strong> Busy</div>
+                            <div class="stat-item"><strong>2</strong> Maintenance</div>
+                            <div class="stat-item"><strong>1</strong> Breakdown</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>Materials</h3>
+                        <div class="stat-number">142</div>
+                        <div class="stat-breakdown">
+                            <div class="stat-item"><strong>8</strong> Low Stock</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>Work Orders</h3>
+                        <div class="stat-number">32</div>
+                        <div class="stat-breakdown">
+                            <div class="stat-item"><strong>8</strong> Pending</div>
+                            <div class="stat-item"><strong>12</strong> In Progress</div>
+                            <div class="stat-item"><strong>10</strong> Completed</div>
+                            <div class="stat-item"><strong>2</strong> On Hold</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Operators Page -->
+            <div id="operators" class="page">
+                <div class="page-header">
+                    <h2>Operators</h2>
+                    <button class="btn btn-primary">
+                        <span class="material-icons">add</span>
+                        Add Operator
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Skills</th>
+                                <th>Certifications</th>
+                                <th>Status</th>
+                                <th align="right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John Smith</td>
+                                <td>Welding, Assembly</td>
+                                <td>ISO-9001, Safety Level 3</td>
+                                <td><span class="chip chip-success">Available</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sarah Johnson</td>
+                                <td>Quality Control, Inspection</td>
+                                <td>QC Level 2, ISO-9001</td>
+                                <td><span class="chip chip-info">Assigned</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Michael Chen</td>
+                                <td>Machine Operation, Maintenance</td>
+                                <td>Operator Level 4, Safety Level 3</td>
+                                <td><span class="chip chip-warning">On Break</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Emily Davis</td>
+                                <td>Assembly, Packaging</td>
+                                <td>Assembly Level 2</td>
+                                <td><span class="chip chip-success">Available</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Robert Wilson</td>
+                                <td>Welding, Fabrication, CNC</td>
+                                <td>Welding Level 5, ISO-9001</td>
+                                <td><span class="chip chip-info">Assigned</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Machines Page -->
+            <div id="machines" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Machines</h2>
+                    <button class="btn btn-primary">
+                        <span class="material-icons">add</span>
+                        Add Machine
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Capabilities</th>
+                                <th>Last Maintenance</th>
+                                <th>Status</th>
+                                <th align="right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CNC-001</td>
+                                <td>CNC Milling</td>
+                                <td>5-axis, Precision Cutting</td>
+                                <td>2026-05-20</td>
+                                <td><span class="chip chip-success">Idle</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WELD-003</td>
+                                <td>Robotic Welder</td>
+                                <td>MIG, TIG, Spot Welding</td>
+                                <td>2026-05-15</td>
+                                <td><span class="chip chip-info">Busy</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PRESS-012</td>
+                                <td>Hydraulic Press</td>
+                                <td>200T Capacity, Forming</td>
+                                <td>2026-05-10</td>
+                                <td><span class="chip chip-warning">Maintenance</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>LATHE-007</td>
+                                <td>CNC Lathe</td>
+                                <td>Turning, Threading</td>
+                                <td>2026-04-28</td>
+                                <td><span class="chip chip-success">Idle</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ASSY-004</td>
+                                <td>Assembly Line</td>
+                                <td>Automated Assembly, Testing</td>
+                                <td>2026-05-18</td>
+                                <td><span class="chip chip-info">Busy</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Materials Page -->
+            <div id="materials" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Materials</h2>
+                    <button class="btn btn-primary">
+                        <span class="material-icons">add</span>
+                        Add Material
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Location</th>
+                                <th>Allocated</th>
+                                <th>Available</th>
+                                <th align="right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Steel Plate 10mm</td>
+                                <td>500</td>
+                                <td>kg</td>
+                                <td>Warehouse A-12</td>
+                                <td>120</td>
+                                <td>380</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Aluminum Rods</td>
+                                <td>200</td>
+                                <td>pcs</td>
+                                <td>Warehouse B-03</td>
+                                <td>45</td>
+                                <td>155</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Welding Wire</td>
+                                <td>50</td>
+                                <td>kg</td>
+                                <td>Workshop Floor</td>
+                                <td>42</td>
+                                <td style="color: #f57c00; font-weight: 500;">8 ⚠️</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Hydraulic Fluid</td>
+                                <td>100</td>
+                                <td>liters</td>
+                                <td>Chemical Storage</td>
+                                <td>15</td>
+                                <td>85</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Bolts M12x50</td>
+                                <td>5000</td>
+                                <td>pcs</td>
+                                <td>Parts Bin C-24</td>
+                                <td>1200</td>
+                                <td>3800</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">delete</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Work Orders Page -->
+            <div id="workorders" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Work Orders</h2>
+                    <button class="btn btn-primary">
+                        <span class="material-icons">add</span>
+                        Create Work Order
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Description</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Required Resources</th>
+                                <th>Duration</th>
+                                <th align="right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WO-2026-001</td>
+                                <td>Fabricate Steel Frame</td>
+                                <td><span class="chip chip-error">Urgent</span></td>
+                                <td><span class="chip chip-info">In Progress</span></td>
+                                <td>2 Operators, 1 Machine</td>
+                                <td>4 hours</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">visibility</span></button>
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-002</td>
+                                <td>Quality Inspection Batch #45</td>
+                                <td><span class="chip chip-warning">High</span></td>
+                                <td><span class="chip chip-success">Completed</span></td>
+                                <td>1 Operator</td>
+                                <td>2 hours</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">visibility</span></button>
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-003</td>
+                                <td>Machine Maintenance - CNC-001</td>
+                                <td><span class="chip chip-info">Normal</span></td>
+                                <td><span class="chip chip-warning">On Hold</span></td>
+                                <td>1 Operator, Parts</td>
+                                <td>3 hours</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">visibility</span></button>
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-004</td>
+                                <td>Aluminum Parts Assembly</td>
+                                <td><span class="chip chip-info">Normal</span></td>
+                                <td><span class="chip">Pending</span></td>
+                                <td>3 Operators, 2 Machines</td>
+                                <td>6 hours</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">visibility</span></button>
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-005</td>
+                                <td>Welding Joint Components</td>
+                                <td><span class="chip chip-warning">High</span></td>
+                                <td><span class="chip chip-info">In Progress</span></td>
+                                <td>2 Operators, 1 Machine</td>
+                                <td>5 hours</td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">visibility</span></button>
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Allocation Page -->
+            <div id="allocation" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Resource Allocations</h2>
+                    <button class="btn btn-primary">
+                        <span class="material-icons">add</span>
+                        New Allocation
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Work Order</th>
+                                <th>Resource Type</th>
+                                <th>Resource</th>
+                                <th>Quantity</th>
+                                <th>Allocated By</th>
+                                <th>Status</th>
+                                <th align="right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WO-2026-001</td>
+                                <td>Operator</td>
+                                <td>Sarah Johnson</td>
+                                <td>-</td>
+                                <td>Admin User</td>
+                                <td><span class="chip chip-info">Active</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">close</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-001</td>
+                                <td>Machine</td>
+                                <td>WELD-003</td>
+                                <td>-</td>
+                                <td>Admin User</td>
+                                <td><span class="chip chip-info">Active</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">close</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-001</td>
+                                <td>Material</td>
+                                <td>Steel Plate 10mm</td>
+                                <td>50 kg</td>
+                                <td>Admin User</td>
+                                <td><span class="chip chip-info">Active</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">close</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-005</td>
+                                <td>Operator</td>
+                                <td>Robert Wilson</td>
+                                <td>-</td>
+                                <td>Supervisor</td>
+                                <td><span class="chip chip-info">Active</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">edit</span></button>
+                                    <button class="icon-btn"><span class="material-icons">close</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-2026-002</td>
+                                <td>Operator</td>
+                                <td>Michael Chen</td>
+                                <td>-</td>
+                                <td>Supervisor</td>
+                                <td><span class="chip chip-success">Completed</span></td>
+                                <td align="right">
+                                    <button class="icon-btn"><span class="material-icons">visibility</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Analytics Page -->
+            <div id="analytics" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2>Analytics</h2>
+                </div>
+                
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 16px;">Resource Utilization</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div>
+                            <p style="color: #666; margin-bottom: 8px;">Operator Utilization</p>
+                            <div style="font-size: 32px; font-weight: 300; color: #1976d2;">62.5%</div>
+                            <p style="font-size: 13px; color: #666; margin-top: 4px;">15 of 24 assigned</p>
+                        </div>
+                        <div>
+                            <p style="color: #666; margin-bottom: 8px;">Machine Utilization</p>
+                            <div style="font-size: 32px; font-weight: 300; color: #1976d2;">55.6%</div>
+                            <p style="font-size: 13px; color: #666; margin-top: 4px;">10 of 18 in use</p>
+                        </div>
+                        <div>
+                            <p style="color: #666; margin-bottom: 8px;">Material Turnover</p>
+                            <div style="font-size: 32px; font-weight: 300; color: #1976d2;">78.2%</div>
+                            <p style="font-size: 13px; color: #666; margin-top: 4px;">Average allocation rate</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 16px;">Work Order Performance</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div>
+                            <p style="color: #666; margin-bottom: 8px;">Completion Rate</p>
+                            <div style="font-size: 32px; font-weight: 300; color: #2e7d32;">85.7%</div>
+                            <p style="font-size: 13px; color: #666; margin-top: 4px;">Last 30 days</p>
+                        </div>
+                        <div>
+                            <p style="color: #666; margin-bottom: 8px;">Average Duration</p>
+                            <div style="font-size: 32px; font-weight: 300; color: #1976d2;">4.2h</div>
+                            <p style="font-size: 13px; color: #666; margin-top: 4px;">Per work order</p>
+                        </div>
+                        <div>
+                            <p style="color: #666; margin-bottom: 8px;">On-Time Delivery</p>
+                            <div style="font-size: 32px; font-weight: 300; color: #2e7d32;">92%</div>
+                            <p style="font-size: 13px; color: #666; margin-top: 4px;">Within estimated time</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 16px;">Idle Time Analysis</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Type</th>
+                                <th>Total Idle Time</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LATHE-007</td>
+                                <td>Machine</td>
+                                <td>12.5 hours</td>
+                                <td>52%</td>
+                            </tr>
+                            <tr>
+                                <td>Emily Davis</td>
+                                <td>Operator</td>
+                                <td>8.2 hours</td>
+                                <td>34%</td>
+                            </tr>
+                            <tr>
+                                <td>CNC-001</td>
+                                <td>Machine</td>
+                                <td>6.8 hours</td>
+                                <td>28%</td>
+                            </tr>
+                            <tr>
+                                <td>John Smith</td>
+                                <td>Operator</td>
+                                <td>5.5 hours</td>
+                                <td>23%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show selected page
+            document.getElementById(pageName).style.display = 'block';
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+        }
+        
+        // Show dashboard by default
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('dashboard');
+        });
+    </script>
+</body>
+</html>

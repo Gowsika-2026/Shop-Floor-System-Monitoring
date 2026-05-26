@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "./scripts/validate-imports.sh",
+        "windows": "powershell -ExecutionPolicy Bypass -File .github/hooks/scripts/validate-imports.ps1",
+        "timeout": 10
+      }
+    ]
+  }
+}
