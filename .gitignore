@@ -139,3 +139,6 @@ mocks/
 *~
 \#*\#
 .\#*
+
+# Temporary directories
+ToGit/
